@@ -92,7 +92,7 @@ curl -L '<signed-url>' -o scripts.tar.gz && tar xzf scripts.tar.gz
 
 Endpoint `POST https://tts.api.cloud.yandex.net/speech/v1/tts:synthesize`, заголовок `Authorization: Api-Key <AQVN...>`, поля формы `text`, `lang=ru-RU`, `voice`, `emotion`, `speed`, `format=mp3`. Лимит ~5000 символов на запрос — `voice_script.py` сам склеивает соседние реплики одной роли в чанки <4000.
 
-Батч по главам — `src/run_roles.sh`-обёртка: цикл по главам, MP3 главы уже есть → skip; иначе `python3 src/voice_script.py roles_full-chNN.md <slug>-roles_full-chNN.mp3`; любой rc≠0 → exit. Один MP3 на главу, нуль-паддинг.
+Батч по главам — `src/run_roles.sh`-обёртка: цикл по главам, MP3 главы уже есть → skip; иначе `python3 src/voice_script.py roles_full-chNN.md <slug>-roles_full-chNN.mp3`; любой rc≠0 → exit. Один MP3 на главу, нуль-паддинг. Синтез идёт **одним вызовом API на реплику** (тарификация за символы, дешевле не становится от склейки), и рядом с MP3 скрипт пишет **`<имя>.srt`** — субтитры: одна строка сценария = один кью, тайминги из реальных длительностей сегментов + @gap/@pause.
 
 Дисциплина длинных прогонов:
 - **Один процесс в один момент.** Перед запуском `pgrep -af "pytho[n]3 .*voice_script"` — два инстанса на одной главе дерутся за `.work-chNN/` и убивают друг друга.
