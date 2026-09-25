@@ -62,11 +62,8 @@
 |---|---|---|
 | Тонкая структура (qntm/Сэм Хьюз), 42 гл. | v1 один диктор 1.25 | 12.3 ч |
 | Тонкая структура, re-voice | по ролям, диктор 1.15 | 14.3 ч |
-| REMOVED | ролевая, jane good 0.9 | 43:40 |
-| REMOVED | ролевая | 24 мин |
-| REMOVED | 11 ролей, SpeechKit | v3 |
 
 ## Структура репо
 
 - `src/` — весь инструментарий (синтез, FB2, скрейп, батчи)
-- `books/` — сценарии и исходные тексты: `fine-structure-v1/`, `fine-structure-roles/`, `REMOVED/`, `REMOVED/`, `REMOVED/`
+- `books/` — сценарии и исходные тексты: `fine-structure-v1/`, `fine-structure-roles/`, `fine-structure-roles_full/`, `fine-structure-scenes/`
