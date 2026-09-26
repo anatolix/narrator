@@ -10,6 +10,7 @@
 
 - [forms.md](forms.md) — вся книга одной таблицей, 22100 форм
 - [flagged.md](flagged.md) — только ⚠, 99 форм
+- [suspected_forms.md](suspected_forms.md) — формы, у которых возможно несколько ударений (869)
 - [fixes.md](fixes.md) — ручная проверка ⚠ (26.09), уже применено
 
 Скрипт: `build_form_table.py` (нужен pylem с патчем accent_json).
