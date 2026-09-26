@@ -1,0 +1,50 @@
+import json, collections
+occ=json.load(open('/tmp/flag_occ.json'))
+norm=lambda s:s.replace('ё','е')
+VOW=set('аеёиоуыэюя')
+# pylem wrong, text right
+NO={'зв+ёзды':'вин./им.мн. «зв+ёзды» — верно, pylem дал род.ед.','сл+ёзы':'им.мн. «сл+ёзы» верно','ст+ёкла':'им.мн. «ст+ёкла» верно','ход+у':'«на ходу» — местный падеж, верно','+адам':'имя А́дам, верно','нь+ютона':'Нью́тон, верно','зем+ель':'род.мн. земе́ль — норма','утр+ам':'«по утрам» — норма',
+    'ал+екс':None}
+NO.pop('ал+екс')
+CTX={'час+а':'«два/четыре часа» — час+а верно; «около часа» — ч+аса','утр+а':'«8 утра», «до/с утра» — утр+а верно; «доброго утра» — +утра','след+а':'«ни следа» — обычно след+а'}
+DISP={'одновр+еменно':'оба в норме, словарная — одноврем+енно','гл+ядя':'оба в норме','пр+игоршню':'оба в норме','зам+ерла':'норма з+амерла / замерл+а, зам+ерла — ошибка','+обо':'проклитика, ударение на «мне»','+из-под':'проклитика'}
+def pick(o):
+    opts=o['opts']
+    return opts[0] if len(opts)==1 else opts[0]
+def recase(orig,t):
+    p=orig.replace('+',''); out='';j=0
+    for ch in t:
+        if ch=='+': out+='+'
+        else: out+=p[j] if j<len(p) else ch; j+=1
+    return out
+def verdict(o):
+    k=o['low']
+    if k in NO: return 'no',NO[k]
+    if k in CTX: return 'ctx',CTX[k]
+    if k in DISP: return ('yes' if k=='зам+ерла' else 'disp'),DISP[k]
+    if '-' in k:
+        parts=k.split('-')
+        if all(sum(c in VOW for c in p)>=1 for p in parts) and parts[0].replace('+','')==parts[1].replace('+','') or k.startswith(('давн','всег+о','пр+осто-')):
+            return 'disp','удвоение — второе ударение естественно'
+        if any(x in k for x in ('ниб','л+ибо','к+ое','-так+и','по-')):
+            return 'yes','частица/приставка безударна'
+        return 'disp','сложное слово, побочное ударение допустимо'
+    return 'yes',''
+g=collections.OrderedDict()
+for o in occ: g.setdefault(o['low'],[]).append(o)
+sec={'yes':[], 'ctx':[], 'disp':[], 'no':[]}
+for k,L in sorted(g.items(),key=lambda kv:-len(kv[1])):
+    v,why=verdict(L[0]); sec[v].append((k,L,why))
+T={'yes':'1. Меняю — ошибка ruaccent','ctx':'2. По контексту — часть мест верна','disp':'3. Спорно — решай на слух','no':'4. Не трогаю — ошибся pylem, текст верен'}
+out=['# Правки ударений по ⚠ (сверка с pylem/aot)','',f'Всего {len(occ)} мест в {len(g)} формах. В текст ничего не внесено — жду твоего решения.','']
+for s in ['yes','ctx','disp','no']:
+    n=sum(len(L) for _,L,_ in sec[s]); out+=[f'## {T[s]} — {len(sec[s])} форм, {n} мест','','| гл:стр | было → стало | контекст | заметка |','|---|---|---|---|']
+    for k,L,why in sec[s]:
+        for i,o in enumerate(L):
+            new=recase(o['orig'],pick(o))
+            arrow=f"{o['orig']} → {new}" if s!='no' else f"{o['orig']} (pylem: {new})"
+            out.append(f"| {o['ch']}:{o['ln']} | {arrow} | {o['ctx']} | {why if i==0 else ''} |")
+    out.append('')
+open(W:='/home/vellum/.local/share/vellum/assistants/juno/.vellum/workspace/narrator/reports/fine-structure-forms/fixes.md','w',encoding='utf-8').write('\n'.join(out)+'\n')
+for s in sec: print(s,len(sec[s]),sum(len(L) for _,L,_ in sec[s]))
+print('YES list:',' '.join(f'{k}>{L[0]["opts"][0]}' for k,L,_ in sec['yes'] if '-' not in k))
