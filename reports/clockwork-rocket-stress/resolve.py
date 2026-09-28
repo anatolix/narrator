@@ -130,7 +130,7 @@ def run(ci):
     print('chunk',ci,'done',len(best),'/',len(ids),flush=True)
     json.dump(cache,open(CACHEF,'w'),ensure_ascii=False)
 print('chunks',len(chunks),flush=True)
-with ThreadPoolExecutor(8) as ex: list(ex.map(run,range(len(chunks))))
+with ThreadPoolExecutor(int(os.environ.get('THREADS','4'))) as ex: list(ex.map(run,range(len(chunks))))
 ans={}
 for v in cache.values(): ans.update(v)
 stat={'auto':len(toks)-len(amb),'amb':len(amb),'one':0,'multi':0,'noanswer':0,'badpick':0}
