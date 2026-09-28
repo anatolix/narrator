@@ -126,7 +126,7 @@ def run(ci):
             print('chunk',ci,prof,'partial',len(got),'/',len(ids),flush=True)
         except Exception as e: print('chunk',ci,prof,'fail',repr(e)[:150],(p.stderr[-150:] if 'p' in dir() else ''),flush=True)
         time.sleep(5)
-    if len(best)>=len(ids)*0.97 or os.environ.get('FINAL'): cache[key]=best
+    if len(best)>=len(ids)*0.97 or (os.environ.get('FINAL') and best): cache[key]=best
     print('chunk',ci,'done',len(best),'/',len(ids),flush=True)
     json.dump(cache,open(CACHEF,'w'),ensure_ascii=False)
 print('chunks',len(chunks),flush=True)
