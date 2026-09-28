@@ -36,13 +36,24 @@ rev=[f'# Глава {CH} — ударения на проверку\n',f'Три 
 for t,v,w,ctx in A: rev.append(f"- **L{t['line']}** «{t['s']}» → [{', '.join(apply(f,t['s']) for f in t['res'])}]\n  - {v}" + (f"\n  - почему: {w}" if w else '') + f"\n  > {ctx}")
 rev.append(f'\n## Решено большинством 2:1: {len(B)}\nВ тексте стоит вариант большинства. Глянь, согласен ли.\n')
 for t,v,w,ctx in B: rev.append(f"- **L{t['line']}** «{t['s']}» → {apply(t['res'][0],t['s'])}\n  - {v}\n  > {ctx}")
+VW='аеёиоуыэюяАЕЁИОУЫЭЮЯ'
+def fix(x):
+    if '+' in x or nv(x)<=1: return x
+    i=next((k for k,c in enumerate(x) if c in 'ёЁ'),None)
+    if i is not None: return x[:i]+'+'+x[i:]
+    if '-' in x:
+        ps=x.split('-')
+        for n,p in enumerate(ps):
+            if p.lower() not in PART and nv(p)==1:
+                j=next(k for k,c in enumerate(p) if c in VW); ps[n]=p[:j]+'+'+p[j:]; return '-'.join(ps)
+    return x
 res=[]
 for l in lines:
     if 'raw' in l: res.append(l['raw']); continue
     o=l['pre']
     for p in l['parts']:
         if isinstance(p,int):
-            t=T[p]; fs=[apply(f,t['s']) for f in t['res']]
+            t=T[p]; fs=[fix(apply(f,t['s'])) for f in t['res']]
             o+=fs[0] if len(fs)==1 else '['+', '.join(fs)+']'
         else: o+=p
     res.append(o)
@@ -50,7 +61,7 @@ txt='\n'.join(res)+'\n'
 chk=re.sub(r'\[([^\],\]]+)(?:, [^\]]+)?\]',r'\1',txt)
 nz=lambda x:x.replace('+','').replace('ё','е').replace('Ё','Е')
 st['verbatim']=nz(chk).rstrip()==nz('\n'.join(S[:len(M)])+'\n').rstrip()
-uns=[(t['line'],t['s']) for t in toks if len(t['res'])==1 and nv(t['s'])>1 and '+' not in t['res'][0]]
+uns=[(t['line'],t['s']) for t in toks if len(t['res'])==1 and nv(t['s'])>1 and '+' not in fix(apply(t['res'][0],t['s']))]
 st['auto']=len(toks)-len(amb); st['amb']=len(amb); st['unstressed']=len(uns)
 open(f'{OUT}/ch{CH}.md','w',encoding='utf-8').write(txt)
 open(f'{OUT}/ch{CH}-review.md','w',encoding='utf-8').write('\n'.join(rev)+'\n')
