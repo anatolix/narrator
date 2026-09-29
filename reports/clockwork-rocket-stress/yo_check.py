@@ -36,3 +36,5 @@ open('yo-check.md','w',encoding='utf-8').write('\n'.join(out))
 for title,S in sec:
     ws=[w for w in g if (w in S if S is not None else w not in A|B)]
     print(title, sum(len(g[w]) for w in ws), [(w,len(g[w])) for w in sorted(ws,key=lambda w:-len(g[w]))])
+import json
+json.dump([[ch,i,w,t,yo,ctx] for w in g if w not in A|B for ch,i,t,yo,ctx in g[w]],open('yo_review.json','w'),ensure_ascii=False)

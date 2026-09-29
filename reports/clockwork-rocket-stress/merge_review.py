@@ -44,5 +44,17 @@ for w,its in sorted(g.items(),key=lambda x:(-len(x[1]),x[0])):
         out.append(f'- **ch{it["ch"]}:{it["line"]}** {mark} → {it["pick"]}  ({it["runs"]})')
         out.append(f'  > {it["ctx"]}')
     out.append('')
+import json as _j
+YO=_j.load(open('yo_review.json')) if os.path.exists('yo_review.json') else []
+YO=[x for x in YO if (x[0],x[1],x[2]) not in DONE]
+if YO:
+    out.append(f'# ё под вопросом — {len(YO)} мест (ruaccent/pylem давали ё, в тексте е, прогоны единогласны)'); out.append('')
+    gy=collections.defaultdict(list)
+    for x in YO: gy[x[2]].append(x)
+    for w,its in sorted(gy.items(),key=lambda x:-len(x[1])):
+        out.append(f'## ё? {w} — {len(its)}'); out.append('Варианты с ё: '+', '.join(sorted({y for x in its for y in x[4]}))); out.append('')
+        for ch,l,w2,t,yo,ctx in its: out.append(f'- **ch{ch}:{l}** сейчас {t}'); out.append(f'  > …{ctx}…')
+        out.append('')
+print('yo',len(YO))
 open('review-all.md','w',encoding='utf-8').write('\n'.join(out))
 print(len(items),'items',len(g),'words'); print([(w,len(v)) for w,v in sorted(g.items(),key=lambda x:-len(x[1]))[:25]])
