@@ -17,6 +17,10 @@ for f in sorted(glob.glob('resolved/ch*-review.md')):
 def variants(it):
     v=set(re.findall(r'[\w+\-ёЁ]*\+[\w+\-ёЁ]*',it['pick']+' '+it['runs']))
     return v
+import json,os
+RULE={'самом','самой','самого','должно','одновременно'}
+EXC={(c,l) for c,l,w in json.load(open('rules_exceptions.json'))} if os.path.exists('rules_exceptions.json') else set()
+items=[it for it in items if it['word'].lower() not in RULE or (it['ch'],it['line']) in EXC]
 g=collections.defaultdict(list)
 for it in items: g[it['word'].lower().replace('ё','е')].append(it)
 out=['# Заводная ракета — ударения на проверку, сводный список','',f'Всего {len(items)} мест, {len(g)} разных слов. Отсортировано по частоте.','','Обозначения: **❓** — прогоны разошлись, в тексте стоят все варианты в скобках; **2:1** — в тексте стоит вариант большинства.','']
