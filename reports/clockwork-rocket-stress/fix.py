@@ -9,6 +9,7 @@ hits=0
 for f in sorted(glob.glob('resolved/ch[0-9][0-9].md')):
     ch=f[-5:-3]; L=open(f,encoding='utf-8').read().split('\n'); ch_changed=False
     for n,l in enumerate(L,1):
+        if l.lstrip().startswith(('@','#')): continue
         mp=re.match(r'^[А-ЯЁA-Z0-9_ ]{1,30}:\s*',l); pfx=mp.group(0) if mp else ''; l=l[len(pfx):]
         toks=tokrx.findall(l); words=[i for i,t in enumerate(toks) if re.match(r'[\[А-Яа-яЁё+]',t)]
         base=[N(toks[i].strip('[]').split(', ')[0]) for i in words]
