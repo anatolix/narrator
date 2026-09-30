@@ -52,7 +52,7 @@
 
 ## Конвейер
 
-1. Источник: FB2 → markdown (`src/fb2_to_md.py`) или скрейп рассказа (`src/fetch_story.py` — Literotica: `<article itemprop="articleBody">`, samlib: cp1251).
+1. Источник: FB2 → markdown (`src/fb2_to_md.py`) или скрейп рассказа (`src/fetch_story.py`).
 2. Перевод на русский, если нужно. Чистые .en.md и .ru.md сохраняются.
 3. Ручная разметка ролей → script.md. **Показать пользователю ДО синтеза** — стоящее правило.
 4. Синтез `src/voice_script.py script.md out.mp3`: резюмируемый (кэш сегментов в `.work-<name>/`), авто-замена неподдержанного голоса по HTTP 400, ретраи.
